@@ -1,6 +1,7 @@
 from django.urls import path
 
-from channels import views
+from . import views
+from .helper import setup_pids
 
 urlpatterns = [
     path('admin/list/', views.channel_list, name='channel_list'),
@@ -9,3 +10,5 @@ urlpatterns = [
     path('watch/<str:nickname>', views.channel_open, name='channel_open'),
     path('read/<str:channel>/<str:filename>', views.channel_read, name='channel_read'),
 ]
+
+setup_pids()

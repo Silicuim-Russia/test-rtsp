@@ -1,9 +1,9 @@
 import os
 import signal
 import shutil
-
 from . import settings as app_settings
 import logging
+from .models import Channel
 
 
 def stop_inactive_stream():
@@ -85,7 +85,14 @@ def ffmpeg_command_builder(input_url, nickname, output_path):
                     '-vsync', '0', '-copyts', '-c:v', 'copy', '-c:a', 'copy',
                     '-hls_flags', 'delete_segments+append_list', '-f', 'hls',
                     '-segment_list_flags', nickname + '_live',
-                    '-hls_time', '1', '-hls_list_size', '3',
+                    '-hls_time', '5', '-hls_list_size', '3',
                     '-hls_segment_filename', output_path + '/%d.ts',
                     output_path + '/index.m3u8'])
     return command
+
+
+def setup_pids():
+    for channel in Channel.objects.all():
+        channel.transcode_pid = 0
+        channel.save()
+    print('PIDs ready')

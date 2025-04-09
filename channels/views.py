@@ -9,7 +9,7 @@ from django.conf import settings
 from . import settings as app_settings
 from .forms import ChannelAddForm
 from .models import Channel
-from channels import helper
+from . import helper
 
 
 # Create your views here.
@@ -54,7 +54,11 @@ def channel_open(request, nickname):
         raise Http404("Channel does not exist")
     # Status that channel is not yet started:
     if channel.transcode_pid < 1:
-        process_id = helper.deploy_transcode_daemon(channel)
+        try:
+            process_id = helper.deploy_transcode_daemon(channel)
+        except Exception as e:
+            print(f"Failed to deploy transcode daemon for channel {channel.nickname}: {e}")
+            raise Http404("Failed to start channel")
         channel.transcode_pid = process_id
         channel.hitting_count = 1
         channel.save()
